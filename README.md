@@ -1,37 +1,34 @@
-# Project Sapphire
+# Project Ruby
 
-Welcome to Project Sapphire
+Welcome to Project Ruby
 
-> This project creates a map-based communications mechanism for users to share travel paths. The intended use is primarily for friends and family that would like to keep track of travel paths to ensure the traveller arrives safe and sound and within expectations.
+> Project Ruby was built as part of the Legacy portion of Hack Reactor's onsite Software Engineering Immersive Program.  The Project Ruby Team inhireted Lighthouse, a mobile app that attempted to connect friends and display their locations on a map.  The team has made significant contributions to the Lighthouse application, which include strengthening core functionality, expanding feature set, and integrating additional third-party APIs.
 
 ## Team
 
-  - __Product Owner__: Inje Yeo
-  - __Scrum Master__: Krista Moroder
-  - __Development Team Members__: Inje Yeo, Krista Moroder, Steven Tran, Tor Sinclair
+  Travis Baratacart
+  Colin Goltra
+  David Ogor
+  Michael Rico
 
-## Table of Contents
+## Expanded Functionality
 
-1. [Usage](#Usage)
-1. [Requirements](#requirements)
-1. [Development](#development)
-    1. [Installing Dependencies](#installing-dependencies)
-    1. [Tasks](#tasks)
-1. [Team](Inje Yeo, Krista Moroder, Steven Tran, Tor Sinclair)
-1. [Contributing](#contributing)
-
-## Usage
-
-## Requirements
-
-## Development
-
-### Installing Dependencies
-
-From within the root directory:
-
-### Roadmap
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+-Friend Requests
+-Expanded Search Functionality
+  -Fuzzy Search
+-Status Updates
+  -Statuses Display On Map
+-Camera Roll Integration
+  -Access Local Photos or Use Native Camera
+  -Stores Photos to Server and References in Firebases
+  -Update Profile Photo and Icon
+-Improved Map Functionality
+  -Users Opt-In to Location Sharing
+  -Customizable User Icons
+  -Friends on Map are Labeled
+  -Friends' Statuses Appear on Map
+-Geolocation
+  -Destination Sharing
+-SMS Text Notifications
+  -Twilio API Integration
+-Web Sockets
