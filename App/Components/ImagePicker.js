@@ -43,6 +43,7 @@ class ImagePicker extends Component {
         var uploadPrefObj = {
           uri: source.uri,
           uploadUrl: 'http://159.203.222.32:4568/photos/',
+          // uploadUrl: 'http://localhost:4568/photos/',
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -54,6 +55,7 @@ class ImagePicker extends Component {
           } else {
             var data = JSON.parse(res.data);
             var photoUrl = 'http://159.203.222.32:4568/photos/' + data.filename;
+            // var photoUrl = 'http://localhost:4568/photos/' + data.filename;
             api.updateUserData(this.props.authInfo, 'profileImageURL', photoUrl);
             this.props.updatePhoto(photoUrl);
           }
