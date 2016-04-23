@@ -80,7 +80,6 @@ class Friends extends Component{
     } else {
       var user = this.props.userInfo;
       var friends = this.props.friendData;
-      console.log('friends: ', friends);
       var friendReqs = this.props.friendReqData;
 
       if (friends.length > 0) {
