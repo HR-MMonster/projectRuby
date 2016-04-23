@@ -86,7 +86,7 @@ class ProfileEdit extends Component{
     return (
 
       <View style={styles.container}>
-        <ImagePicker />
+        <ImagePicker {...this.props}/>
         <Text style={styles.changeText}>{this.state.updateAlert}</Text>
         {list}
       </View>
