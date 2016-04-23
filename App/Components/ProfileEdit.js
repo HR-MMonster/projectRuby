@@ -82,12 +82,11 @@ class ProfileEdit extends Component{
           </View>
         )
     })
-         // <TouchableHighlight onPress={() => console.log('<><><>path from image picker:  ', ImagePicker.state.avatarSource)}></TouchableHighlight>
 
     return (
 
       <View style={styles.container}>
-        <ImagePicker />
+        <ImagePicker {...this.props}/>
         <Text style={styles.changeText}>{this.state.updateAlert}</Text>
         {list}
       </View>

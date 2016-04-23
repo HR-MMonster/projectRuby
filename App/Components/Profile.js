@@ -22,6 +22,13 @@ class Profile extends Component{
     };
   }
 
+
+  updatePhotoWithLocal(localUrl) {
+    this.state.userData.profileImageURL = localUrl;
+    console.log(localUrl);
+    this.forceUpdate();
+  }
+
   getRowTitle(user, item) {
     item = item;
     return item[0] ? item[0].toUpperCase() + item.slice(1) : item;
@@ -40,7 +47,7 @@ class Profile extends Component{
     this.props.navigator.push({
       title: 'Edit Profile',
       component: ProfileEdit,
-      passProps: {userData: that.state.userData, authInfo: that.props.userInfo, handleProfileRender: this.handleProfileRender.bind(this)}
+      passProps: {userData: that.state.userData, authInfo: that.props.userInfo, updatePhoto: that.updatePhotoWithLocal.bind(this), handleProfileRender: this.handleProfileRender.bind(this)}
     });
   }
 
@@ -67,24 +74,14 @@ class Profile extends Component{
     this.setState({
       status: ''
     });
-    // TODO: Refactor below
-    // var item = item;
     var myData = this.props.userInfo;
     var that = this;
     console.log(myData);
 
     api.updateUserData(myData, 'status', statusUpdate);
 
-    // that.setState({
-    //   updateAlert: 'You have updated your info!'
-    // })
-
     this.handleProfileRender('status', statusUpdate);
 
-    // setTimeout(function() {
-    //   that.setState({ updateAlert: '' })
-    // }, 1000);
-    // send status updat to firbase with api
   }
 
   handleChange(e) {
@@ -141,7 +138,7 @@ class Profile extends Component{
             <TouchableHighlight onPress={() => this.editProfile()}>
               <Image style={styles.editImage} source={require('../Images/edit.png')} />
             </TouchableHighlight>
-            <Image style={styles.badgeImage} source={{uri: userData.profileImageURL}} />
+              <Image style={styles.badgeImage} source={{uri: userData.profileImageURL}} />
             <Text style={styles.badgeName}> {userData.name}</Text>
           </View>
           <View style={styles.container}>

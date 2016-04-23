@@ -60,7 +60,7 @@ app.post('/connect',
     res.status(200).send('I think it worked');
   });
 
-app.post('/photos', upload.single('avatar'), function(req, res) {
+app.post('/photos', upload.single('file'), function(req, res) {
   //get the photo image from request body (via ImagePicker)
   //store it
   var filename = req.file.filename;

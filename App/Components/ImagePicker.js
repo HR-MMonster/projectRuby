@@ -4,6 +4,7 @@ var ImagePickerManager = require('NativeModules').ImagePickerManager;
 import React, {
   CameraRoll,
   View,
+  NativeModules,
   Text,
   Image,
   StyleSheet,
@@ -13,11 +14,14 @@ import React, {
   TextInput
 } from 'react-native';
 
+
 class ImagePicker extends Component {
 
   state = {
     avatarSource: null
   };
+
+
 
   selectPhotoTapped() {
     const options = {
@@ -35,41 +39,28 @@ class ImagePicker extends Component {
 
     ImagePickerManager.showImagePicker(options, (response) => {
       console.log('Response = ', response.uri);
-
-      // if (response.didCancel) {
-      //   console.log('User cancelled photo picker');
-      // }
-      // else if (response.error) {
-      //   console.log('ImagePickerManager Error: ', response.error);
-      // }
-      // else if (response.customButton) {
-      //   console.log('User tapped custom button: ', response.customButton);
-      // }
-      // else {
-        // You can display the image using either:
-        //const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
         var source = {uri: response.uri.replace('file://', ''), isStatic: true};
+        var uploadPrefObj = {
+          uri: source.uri,
+          uploadUrl: 'http://159.203.222.32:4568/photos/',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        };
 
-          console.log('<><><><> source url: ', source.uri);
-
-        // fetch('../../Server/server.js', {method: "POST", body: source.uri})
-        // .then((response) => response.json())
-        // .then((data) => {
-        //   // api.updateUserData('/photos/' + data, 'profileImageURL', value);
-        //   console.log(data);
-        // })
-        // .done();
-
-          
-//make post request to server file
-//post the image
-//get data for file url
-//send to api
-
+        React.NativeModules.FileTransfer.upload(uploadPrefObj, (err, res) => {
+          if (err) {
+            console.error('in the error console :(')
+          } else {
+            var data = JSON.parse(res.data);
+            var photoUrl = 'http://159.203.222.32:4568/photos/' + data.filename;
+            api.updateUserData(this.props.authInfo, 'profileImageURL', photoUrl);
+            this.props.updatePhoto(photoUrl);
+          }
+        });
         this.setState({
           avatarSource: source
         });
-      // }
     });
   }
 
@@ -78,7 +69,7 @@ class ImagePicker extends Component {
       <View style={styles.container}>
         <TouchableHighlight onPress={this.selectPhotoTapped.bind(this)}>
           <View>
-          {this.state.avatarSource === null ? <Text>Edit Photo</Text>:<Image style={styles.avatar} source={this.state.avatarSource} />}
+          {this.state.avatarSource === null ? <Text style={styles.photoButtonText}>Edit Photo</Text>:<Image style={styles.avatar} source={this.state.avatarSource} />}
           </View>
         </TouchableHighlight>
       </View>
@@ -93,7 +84,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF'
+    borderRadius: 8,
+    backgroundColor: '#9dc7c9'
+  },
+    photoButtonText: {
+    fontSize: 18,
+    color: 'black'
   },
   avatarContainer: {
     borderColor: '#9B9B9B',
