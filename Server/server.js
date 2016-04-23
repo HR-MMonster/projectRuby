@@ -110,6 +110,15 @@ io.on('connection', function(socket) {
     io.emit('found location', loc);
   });
 
+  socket.on('hide', () => {
+    for (var i = 0; i < socket.friends.length; i++) {
+      var friendSocket = sockets[socket.friends[i]];
+      if (friendSocket) {
+        friendSocket.emit('logoff', socket.id);
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
     for (var i = 0; i < socket.friends.length; i++) {
       var friendSocket = sockets[socket.friends[i]];

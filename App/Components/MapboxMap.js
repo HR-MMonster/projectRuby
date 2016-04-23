@@ -24,7 +24,7 @@ var MapboxMap = React.createClass({
   mixins: [Mapbox.Mixin],
   getInitialState() {
     return {
-      showLocation: true,
+      showLocation: false,
       zoom: 17,
       boundSet: false,
       currentLoc: undefined,
@@ -59,14 +59,20 @@ var MapboxMap = React.createClass({
     console.log('updating location');
   },
   onUpdateUserLocation(location) {
-    this.emitLocationThrottled(location);
+    console.log('show location: ', this.state.showLocation);
+    if (this.state.showLocation) {
+      this.emitLocationThrottled(location);
+    }
+
     this.setState({currentLoc: location});
 
     if (this.destination) {
       if (this.atSameLocation(location, this.destination, {distance: 1500, unit: 'meters'})) {
         this.removeAnnotation(mapRef, 'destination');
         delete this.destination;
-        this.socket.emit('remove destination');
+        if (this.state.showLocation) {
+          this.socket.emit('remove destination');
+        }
       }
     }
   },
@@ -89,6 +95,7 @@ var MapboxMap = React.createClass({
 
     return turf.inside(point1, point2Vicinity.features[0]);
   },
+
   onLongPress(location) {
     var addDestination = function() {
       this.destination = location;
@@ -104,13 +111,17 @@ var MapboxMap = React.createClass({
         id: 'destination'
       });
 
-      this.socket.emit('set destination', location);
+      if (this.state.showLocation) {
+        this.socket.emit('set destination', location);
+      }
     };
 
     var removeDestination = function() {
       delete this.destination;
       this.removeAnnotation(mapRef, 'destination');
-      this.socket.emit('remove destination')
+      if (this.state.showLocation) {
+        this.socket.emit('remove destination')
+      }
     };
 
     if (!this.destination) {
@@ -143,11 +154,11 @@ var MapboxMap = React.createClass({
         || user.showLocation === undefined
         || user.showLocation === 'true') {
         context.setState({showLocation: true});
-      } else {
-        context.setState({showLocation: false});
-      }
-      console.log('SHOWLOCATION IS at login:', context.state.showLocation);
-    });
+    } else {
+      context.setState({showLocation: false});
+    }
+    console.log('SHOWLOCATION IS at login:', context.state.showLocation);
+  });
 
     this.setUserTrackingMode(mapRef, this.userTrackingMode.follow);
     this.socket = io.connect('http://159.203.222.32:4568', {jsonp: false, transports: ['websocket']});
@@ -210,7 +221,9 @@ var MapboxMap = React.createClass({
       // Update connected friend's list with this friends id and send the user's current location
       if (connectedIDs.indexOf(id) < 0) {
         connectedIDs.push(id);
-        this.emitLocation(this.state.currentLoc);
+        if (this.state.showLocation) {
+          this.emitLocation(this.state.currentLoc);
+        }
       }
 
       var myLat = this.state.currentLoc.latitude;
@@ -316,51 +329,60 @@ var MapboxMap = React.createClass({
   sendShowLocation() {
    var user = this.props.userInfo;
    this.setState({showLocation: !this.state.showLocation});
-    console.log('sending showLocation to DB:', this.state.showLocation);
-    console.log('user is:', user);
+   console.log('sending showLocation to DB:', this.state.showLocation);
+   console.log('user is:', user);
 
-    api.updateUserData(user, 'showLocation', ''+this.state.showLocation);
-  },
+   api.updateUserData(user, 'showLocation', ''+this.state.showLocation);
 
-  render: function() {
-    StatusBar.setHidden(true);
-    return (
-      <View style={styles.main}>
-      <Mapbox
-      style={styles.container}
-      direction={0}
-      rotateEnabled={true}
-      scrollEnabled={true}
-      zoomEnabled={true}
-      showsUserLocation={true}
-      ref={mapRef}
-      accessToken={'pk.eyJ1IjoiaW5qZXllbyIsImEiOiJHYUJMWGV3In0.-9Wcu6yJNQmem2IXWaRuIg'}
-      styleURL={this.mapStyles.emerald}
-      userTrackingMode={this.userTrackingMode.none}
-      centerCoordinate={this.state.center}
-      zoomLevel={this.state.zoom}
-      onRegionChange={this.onRegionChange}
-      onRegionWillChange={this.onRegionWillChange}
-      annotations={this.state.annotations}
-      onOpenAnnotation={this.onOpenAnnotation}
-      onRightAnnotationTapped={this.onRightAnnotationTapped}
-      onUpdateUserLocation={this.onUpdateUserLocation}
-      onLongPress={this.onLongPress}
-      onTap={this.onTap} />
-      <Text style={styles.overlayText}>Share Location</Text>
-      <Switch
-      onValueChange={() => this.sendShowLocation()}
-      style={styles.overlayLocationSwitch}
-      value={this.state.showLocation}
-      onTintColor="#feb732"
-      thumbTintColor="#0E3B4A"
-      tintColor="#0E3B4A"/>
-      <TouchableHighlight onPress={() => this.setCenterCoordinateAnimated(mapRef, this.state.currentLoc.latitude, this.state.currentLoc.longitude)}style={styles.compassContainer}>
-      <Image style={styles.compass} source={require('../Images/compass.png')} />
-      </TouchableHighlight>
-      </View>
-      );
+   if (this.state.showLocation) {
+     this.emitLocation(this.state.currentLoc);
+     if (this.destination) {
+      this.socket.emit('set destination', this.destination);
+    }
+  } else {
+    this.socket.emit('hide');
   }
+},
+
+render: function() {
+  StatusBar.setHidden(true);
+  return (
+    <View style={styles.main}>
+    <Mapbox
+    style={styles.container}
+    direction={0}
+    rotateEnabled={true}
+    scrollEnabled={true}
+    zoomEnabled={true}
+    showsUserLocation={true}
+    ref={mapRef}
+    accessToken={'pk.eyJ1IjoiaW5qZXllbyIsImEiOiJHYUJMWGV3In0.-9Wcu6yJNQmem2IXWaRuIg'}
+    styleURL={this.mapStyles.emerald}
+    userTrackingMode={this.userTrackingMode.none}
+    centerCoordinate={this.state.center}
+    zoomLevel={this.state.zoom}
+    onRegionChange={this.onRegionChange}
+    onRegionWillChange={this.onRegionWillChange}
+    annotations={this.state.annotations}
+    onOpenAnnotation={this.onOpenAnnotation}
+    onRightAnnotationTapped={this.onRightAnnotationTapped}
+    onUpdateUserLocation={this.onUpdateUserLocation}
+    onLongPress={this.onLongPress}
+    onTap={this.onTap} />
+    <Text style={styles.overlayText}>Share Location</Text>
+    <Switch
+    onValueChange={() => this.sendShowLocation()}
+    style={styles.overlayLocationSwitch}
+    value={this.state.showLocation}
+    onTintColor="#feb732"
+    thumbTintColor="#0E3B4A"
+    tintColor="#0E3B4A"/>
+    <TouchableHighlight onPress={() => this.setCenterCoordinateAnimated(mapRef, this.state.currentLoc.latitude, this.state.currentLoc.longitude)}style={styles.compassContainer}>
+    <Image style={styles.compass} source={require('../Images/compass.png')} />
+    </TouchableHighlight>
+    </View>
+    );
+}
 });
 
 var width = Dimensions.get('window').width;
