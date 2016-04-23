@@ -334,9 +334,9 @@ var MapboxMap = React.createClass({
       onValueChange={() => this.sendShowLocation()}
       style={styles.overlayLocationSwitch}
       value={this.state.showLocation}
-      onTintColor="black"
-      thumbTintColor="white"
-      tintColor="white" />
+      onTintColor="#feb732"
+      thumbTintColor="#0E3B4A"
+      tintColor="#0E3B4A"/>
       <TouchableHighlight onPress={() => this.setCenterCoordinateAnimated(mapRef, this.state.currentLoc.latitude, this.state.currentLoc.longitude)}style={styles.compassContainer}>
       <Image style={styles.compass} source={require('../Images/compass.png')} />
       </TouchableHighlight>
