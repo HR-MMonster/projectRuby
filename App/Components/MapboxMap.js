@@ -11,6 +11,7 @@ import React, {
   Switch
 } from 'react-native';
 import Mapbox from 'react-native-mapbox-gl';
+import Firebase from 'firebase';
 window.navigator.userAgent = "react-native";
 let io = require('socket.io-client/socket.io');
 
@@ -23,7 +24,7 @@ var MapboxMap = React.createClass({
   mixins: [Mapbox.Mixin],
   getInitialState() {
     return {
-      showLocation: false,
+      showLocation: true,
       zoom: 17,
       boundSet: false,
       currentLoc: undefined,
@@ -131,7 +132,23 @@ var MapboxMap = React.createClass({
     console.log('tapped', location);
   },
   componentDidMount(){
-    this.sendShowLocation();
+    // this.sendShowLocation(); //TODO: remove after refactor
+    var context = this;
+    var userLocationRef = new Firebase(`https://project-ruby.firebaseio.com/UserData/${this.props.userInfo.uid}`);
+
+    userLocationRef.once('value', function(snap) {
+      var user = snap.val();
+      console.log('USER is:', user);
+      if (user.showLocation === null
+        || user.showLocation === undefined
+        || user.showLocation === 'true') {
+        context.setState({showLocation: true});
+      } else {
+        context.setState({showLocation: false});
+      }
+      console.log('SHOWLOCATION IS at login:', context.state.showLocation);
+    });
+
     this.setUserTrackingMode(mapRef, this.userTrackingMode.follow);
     this.socket = io.connect('http://159.203.222.32:4568', {jsonp: false, transports: ['websocket']});
     this.socket.emit('registerID', this.props.userInfo.uid);
@@ -297,10 +314,11 @@ var MapboxMap = React.createClass({
   },
 
   sendShowLocation() {
-    this.setState({showLocation: !this.state.showLocation});
+   var user = this.props.userInfo;
+   this.setState({showLocation: !this.state.showLocation});
     console.log('sending showLocation to DB:', this.state.showLocation);
-    var user = this.props.userInfo;
     console.log('user is:', user);
+
     api.updateUserData(user, 'showLocation', ''+this.state.showLocation);
   },
 
@@ -334,9 +352,9 @@ var MapboxMap = React.createClass({
       onValueChange={() => this.sendShowLocation()}
       style={styles.overlayLocationSwitch}
       value={this.state.showLocation}
-      onTintColor="black"
-      thumbTintColor="white"
-      tintColor="white" />
+      onTintColor="#feb732"
+      thumbTintColor="#0E3B4A"
+      tintColor="#0E3B4A"/>
       <TouchableHighlight onPress={() => this.setCenterCoordinateAnimated(mapRef, this.state.currentLoc.latitude, this.state.currentLoc.longitude)}style={styles.compassContainer}>
       <Image style={styles.compass} source={require('../Images/compass.png')} />
       </TouchableHighlight>

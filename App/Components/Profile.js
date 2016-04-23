@@ -221,7 +221,7 @@ var styles = {
   },
   searchInput: {
     height: 60,
-    width: 300,
+    width: 290,
     // flexDirection: 'row',
     padding: 5,
     paddingLeft: 25,
@@ -231,7 +231,8 @@ var styles = {
   },
   buttonText: {
     fontSize: 18,
-    color: 'white'
+    color: 'white',
+    textAlign: 'center'
   },
   button: {
     height: 60,

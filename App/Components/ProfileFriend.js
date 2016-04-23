@@ -51,7 +51,7 @@ class ProfileFriend extends Component{
         )
     } else {
       var friendData = this.state.friendData;
-      var topicArr = ['email', 'phone'];
+      var topicArr = ['status', 'email', 'phone'];
 
       var list = topicArr.map((item, index) => {
         if(!friendData[item]) {
