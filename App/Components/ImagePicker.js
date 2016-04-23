@@ -52,13 +52,13 @@ class ImagePicker extends Component {
 
           console.log('<><><><> source url: ', source.uri);
 
-        fetch('../../Server/server.js', {method: "POST", body: source.uri})
-        .then((response) => response)
-        .then((data) => {
-          // api.updateUserData('/photos/' + data, 'profileImageURL', value);
-          console.log(data);
-        })
-        .done();
+        // fetch('../../Server/server.js', {method: "POST", body: source.uri})
+        // .then((response) => response.json())
+        // .then((data) => {
+        //   // api.updateUserData('/photos/' + data, 'profileImageURL', value);
+        //   console.log(data);
+        // })
+        // .done();
 
           
 //make post request to server file
