@@ -22,7 +22,7 @@ class FriendsAdd extends Component{
       updateAlert: '',
       isLoading: false,
       foundFriend: false,
-      matches: []  // to store matches of search
+      matches: []
     };
   }
 
@@ -38,11 +38,8 @@ class FriendsAdd extends Component{
     this.setState({
       query: query
     });
-    // console.log(this.state.query);
     var potentialMatches = [];
-    // console.log(this.props.friends);
     var currentFriends = this.props.friends;
-    // console.log('current friends', currentFriends);
     var friendIds = currentFriends.map((friend) => friend.uid);
     var usersRef = new Firebase(`https://project-ruby.firebaseio.com/UserData`);
     usersRef.on('value', function(snap) {
@@ -52,32 +49,21 @@ class FriendsAdd extends Component{
         var name = user.name;
         var email = user.email;
         user.uid = uid;
-        // console.log('user is:', user);
-        // console.log(typeof name);
-        // console.log(name);
         if (name && (friendIds.indexOf(user.uid) === -1)) {
           name = name.toLowerCase();
           if (name.indexOf(query.toLowerCase()) > -1 || email.indexOf(query.toLowerCase()) > -1) {
-            console.log('found a potential match');
             potentialMatches.push(user);
             context.setState({matches: potentialMatches});
           }
         }
-
         context.setState({matches: potentialMatches, isLoading: false});
-        // console.log('state match:', context.state.matches);
-
       }
     });
   }
 
   sendFriendRequest(event, match) {
-    // for (var prop in this.props) {
-    //   console.log(prop, 'is', this.props[prop]);
-    // }
     var userId = this.props.userInfo.uid;
-    console.log('match is', match);
-    var matchId = match.uid;// TODO: need to pass the new friends id right here, maybe as a parameter???
+    var matchId = match.uid;
     var that = this;
 
     api.sendFriendRequest(userId, matchId);
@@ -87,8 +73,6 @@ class FriendsAdd extends Component{
       foundFriend: false,
       matches: []
     });
-
-    // this.goToFriendsView();
 
     setTimeout(function() {
       that.setState({ updateAlert: '' }); // TODO: route to another page
@@ -100,10 +84,6 @@ class FriendsAdd extends Component{
     var friendEmail = that.state.friendEmail;
     var allFriends = that.props.allFriends;
     var foundFriend = false;
-
-    // that.setState({
-    //   isLoading: true
-    // });
 
     if (allFriends.length > 0) {
       for (var i = 0; i < allFriends.length; i++) {
@@ -118,7 +98,6 @@ class FriendsAdd extends Component{
     }
 
     if (foundFriend === false) {
-      console.log('friend email is ', that.state.friendEmail);
       api.findUserByEmail(friendEmail)
         .then(function(res) {
           that.setState({
@@ -147,7 +126,7 @@ class FriendsAdd extends Component{
     that.props.navigator.push({
       title: 'Friends',
       component: Friends,
-      passProps: {userInfo: that.props.userInfo} //allFriends: that.state.friendData
+      passProps: {userInfo: that.props.userInfo}
     });
   }
 
@@ -183,8 +162,6 @@ class FriendsAdd extends Component{
       )
     }
 
-    // var userData = this.props.userData;
-
     return (
       <View style={styles.container}>
         <Text style={styles.alertText}>{this.state.updateAlert}</Text>
@@ -194,12 +171,6 @@ class FriendsAdd extends Component{
               autoCapitalize='none'
               style={styles.searchInput}
               onChange={(event)=>this.searchUsers(event)} />
-            {/*<TouchableHighlight
-              style={styles.button}
-              onPress={()=>this.searchForFriend()}
-              underlayColor='white' >
-              <Text style={styles.buttonText}> SEARCH </Text>
-            </TouchableHighlight> */}
             </View>
         <ScrollView showsVerticalScrollIndicator={true}>
         {loadingFriend}
