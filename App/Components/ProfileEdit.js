@@ -82,6 +82,7 @@ class ProfileEdit extends Component{
           </View>
         )
     })
+         // <TouchableHighlight onPress={() => console.log('<><><>path from image picker:  ', ImagePicker.state.avatarSource)}></TouchableHighlight>
 
     return (
 

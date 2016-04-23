@@ -16,8 +16,7 @@ import React, {
 class ImagePicker extends Component {
 
   state = {
-    avatarSource: null,
-    videoSource: null
+    avatarSource: null
   };
 
   selectPhotoTapped() {
@@ -35,31 +34,42 @@ class ImagePicker extends Component {
     };
 
     ImagePickerManager.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
+      console.log('Response = ', response.uri);
 
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-      }
-      else if (response.error) {
-        console.log('ImagePickerManager Error: ', response.error);
-      }
-      else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
+      // if (response.didCancel) {
+      //   console.log('User cancelled photo picker');
+      // }
+      // else if (response.error) {
+      //   console.log('ImagePickerManager Error: ', response.error);
+      // }
+      // else if (response.customButton) {
+      //   console.log('User tapped custom button: ', response.customButton);
+      // }
+      // else {
         // You can display the image using either:
         //const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
-        var source;
-        if (Platform.OS === 'android') {
-          source = {uri: response.uri, isStatic: true};
-        } else {
-          source = {uri: response.uri.replace('file://', ''), isStatic: true};
-        }
+        var source = {uri: response.uri.replace('file://', ''), isStatic: true};
+
+          console.log('<><><><> source url: ', source.uri);
+
+        fetch('../../Server/server.js', {method: "POST", body: source.uri})
+        .then((response) => response)
+        .then((data) => {
+          // api.updateUserData('/photos/' + data, 'profileImageURL', value);
+          console.log(data);
+        })
+        .done();
+
+          
+//make post request to server file
+//post the image
+//get data for file url
+//send to api
 
         this.setState({
           avatarSource: source
         });
-      }
+      // }
     });
   }
 

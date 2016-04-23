@@ -2,6 +2,20 @@ var bodyParser = require('body-parser');
 var app = require('express')();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+var multer  = require('multer');
+var express = require('express');
+
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/photos')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + '.jpg')
+  }
+})
+var upload = multer({ storage: storage })
+
 
 console.log('Sapphire is listening in on 4568');
 server.listen(4568);
@@ -11,6 +25,10 @@ app.use(bodyParser.json());
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
+
+
+app.use(express.static('public'));
+
 
 app.get('/socket.io-client/socket.io.js', function(req, res) {
   res.sendFile(__dirname + '/socket.io-client/socket.io.js');
@@ -41,6 +59,21 @@ app.post('/connect',
     console.log(req.body);
     res.status(200).send('I think it worked');
   });
+
+app.post('/photos', upload.single('avatar'), function(req, res) {
+  //get the photo image from request body (via ImagePicker)
+  //store it
+  var filename = req.file.filename;
+  res.json({
+    filename: filename
+  });
+  //grab file name
+  //send that file name back to the requester
+});
+
+//handle get request
+  //easy -> use express static to serve a folder
+
 
 var sockets = {};
 
