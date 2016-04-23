@@ -24,6 +24,7 @@ var MapboxMap = React.createClass({
   mixins: [Mapbox.Mixin],
   getInitialState() {
     return {
+      showLocation: true,
       zoom: 17,
       boundSet: false,
       currentLoc: undefined,
@@ -132,7 +133,7 @@ var MapboxMap = React.createClass({
   },
   componentDidMount(){
     // this.sendShowLocation(); //TODO: remove after refactor
-
+    var context = this;
     var userLocationRef = new Firebase(`https://project-ruby.firebaseio.com/UserData/${this.props.userInfo.uid}`);
 
     userLocationRef.once('value', function(snap) {
@@ -141,12 +142,12 @@ var MapboxMap = React.createClass({
       if (user.showLocation === null
         || user.showLocation === undefined
         || user.showLocation === 'true') {
-        this.showLocation = true;
+        context.setState({showLocation: true});
       } else {
-        this.showLocation = false;
+        context.setState({showLocation: false});
       }
+      console.log('SHOWLOCATION IS at login:', context.state.showLocation);
     });
-    console.log('SHOWLOCATION IS at login:', this.showLocation);
 
     this.setUserTrackingMode(mapRef, this.userTrackingMode.follow);
     this.socket = io.connect('http://159.203.222.32:4568', {jsonp: false, transports: ['websocket']});
@@ -314,11 +315,11 @@ var MapboxMap = React.createClass({
 
   sendShowLocation() {
    var user = this.props.userInfo;
-   this.showLocation = (this.showLocation === undefined) ? true : !this.showLocation;
-    console.log('sending showLocation to DB:', this.showLocation);
+   this.setState({showLocation: !this.state.showLocation});
+    console.log('sending showLocation to DB:', this.state.showLocation);
     console.log('user is:', user);
 
-    api.updateUserData(user, 'showLocation', ''+this.showLocation);
+    api.updateUserData(user, 'showLocation', ''+this.state.showLocation);
   },
 
   render: function() {
@@ -350,7 +351,7 @@ var MapboxMap = React.createClass({
       <Switch
       onValueChange={() => this.sendShowLocation()}
       style={styles.overlayLocationSwitch}
-      value={this.showLocation}
+      value={this.state.showLocation}
       onTintColor="#feb732"
       thumbTintColor="#0E3B4A"
       tintColor="#0E3B4A"/>
