@@ -11,6 +11,7 @@ import React, {
   Switch
 } from 'react-native';
 import Mapbox from 'react-native-mapbox-gl';
+import Firebase from 'firebase';
 window.navigator.userAgent = "react-native";
 let io = require('socket.io-client/socket.io');
 
@@ -23,7 +24,6 @@ var MapboxMap = React.createClass({
   mixins: [Mapbox.Mixin],
   getInitialState() {
     return {
-      showLocation: false,
       zoom: 17,
       boundSet: false,
       currentLoc: undefined,
@@ -131,7 +131,23 @@ var MapboxMap = React.createClass({
     console.log('tapped', location);
   },
   componentDidMount(){
-    this.sendShowLocation();
+    // this.sendShowLocation(); //TODO: remove after refactor
+
+    var userLocationRef = new Firebase(`https://project-ruby.firebaseio.com/UserData/${this.props.userInfo.uid}`);
+
+    userLocationRef.once('value', function(snap) {
+      var user = snap.val();
+      console.log('USER is:', user);
+      if (user.showLocation === null
+        || user.showLocation === undefined
+        || user.showLocation === 'true') {
+        this.showLocation = true;
+      } else {
+        this.showLocation = false;
+      }
+    });
+    console.log('SHOWLOCATION IS at login:', this.showLocation);
+
     this.setUserTrackingMode(mapRef, this.userTrackingMode.follow);
     this.socket = io.connect('http://159.203.222.32:4568', {jsonp: false, transports: ['websocket']});
     this.socket.emit('registerID', this.props.userInfo.uid);
@@ -297,11 +313,12 @@ var MapboxMap = React.createClass({
   },
 
   sendShowLocation() {
-    this.setState({showLocation: !this.state.showLocation});
-    console.log('sending showLocation to DB:', this.state.showLocation);
-    var user = this.props.userInfo;
+   var user = this.props.userInfo;
+   this.showLocation = (this.showLocation === undefined) ? true : !this.showLocation;
+    console.log('sending showLocation to DB:', this.showLocation);
     console.log('user is:', user);
-    api.updateUserData(user, 'showLocation', ''+this.state.showLocation);
+
+    api.updateUserData(user, 'showLocation', ''+this.showLocation);
   },
 
   render: function() {
@@ -333,7 +350,7 @@ var MapboxMap = React.createClass({
       <Switch
       onValueChange={() => this.sendShowLocation()}
       style={styles.overlayLocationSwitch}
-      value={this.state.showLocation}
+      value={this.showLocation}
       onTintColor="#feb732"
       thumbTintColor="#0E3B4A"
       tintColor="#0E3B4A"/>
